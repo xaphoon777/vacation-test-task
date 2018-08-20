@@ -186,6 +186,33 @@ public class VacationRestControllerTest {
     }
 
     @Test
+    public void updateVacationOverlapDates2() throws Exception {
+
+        this.repository.deleteAllInBatch();
+
+        List<Vacation> all = repository.findAll();
+        assertEquals(0, all.size());
+
+        Vacation vacation1 = createVacation("10.02.2018", "13.02.2018", "Иванов А.Б.");
+
+        this.mockMvc.perform(post(VACATION_URI)
+                .contentType(contentType)
+                .content(json(vacation1)))
+                .andExpect(status().isOk());
+        all = repository.findAll();
+        assertEquals(1, all.size());
+
+        Vacation vacation2 = createVacation("10.02.2018", "16.04.2018", "Петров В.Г.");
+
+        this.mockMvc.perform(post(VACATION_URI)
+                .contentType(contentType)
+                .content(json(vacation2)))
+                .andExpect(status().isConflict());
+        all = repository.findAll();
+        assertEquals(1, all.size());
+    }
+
+    @Test
     public void updateVacationNotFound() throws Exception {
 
         MockHttpServletRequestBuilder builder =
